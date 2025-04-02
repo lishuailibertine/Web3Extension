@@ -30,14 +30,7 @@
         "storage",
         "unlimitedStorage",
         "clipboardWrite",
-        "http://*/*",
-        "https://*/*",
-        "ws://*/*",
-        "wss://*/*",
         "activeTab",
-        "webRequest",
-        "webRequestBlocking",
-        "*://*.eth/",
         "notifications"
       ]
   }
