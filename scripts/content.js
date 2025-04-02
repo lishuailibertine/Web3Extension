@@ -1,29 +1,31 @@
-(() => {
-  // 先检查 MetaMask 是否已存在
-  if (window.ethereum && !window.ethereum.isMyWallet) {
-    delete window.ethereum; // 先移除 MetaMask
-  }
-  // 定义你的钱包 Provider
-  class MyWeb3Provider {
-    constructor() {
-      this.isMyWallet = true; // 让 DApp 识别你的插件
-      this.isMetaMask = true;
-      this.request = this.request.bind(this);
-    }
-    async request({ method, params }) {
-      if (method === "eth_requestAccounts") {
-        return new Promise((resolve, reject) => {
-            window.postMessage({ type: "CONNECT_WALLET" },"*");
-        });
-      }
-      return Promise.reject(new Error(`方法 ${method} 未实现`));
-    }
-  }
+// 1️⃣ 注入 `inject.js` 到 DApp 网页环境
+const script = document.createElement("script");
+script.src = chrome.runtime.getURL("scripts/inject.js");
+(document.head || document.documentElement).appendChild(script);
 
-  // **确保你的插件在全局作用域中最早注入**
-  Object.defineProperty(window, "ethereum", {
-    configurable: false, // 防止被覆盖
-    writable: false,
-    value: new MyWeb3Provider(),
-  });
-})();
+// 2️⃣ 连接 `background.js`
+const port = chrome.runtime.connect({ name: "web3-connection" });
+
+port.onMessage.addListener((msg) => {
+    console.log("✅ Background 响应:", msg);
+
+    if (msg.type === "WEB3_RESPONSE") {
+        // 发送 Web3 响应回 DApp
+        window.postMessage({ type: "WEB3_RESPONSE", data: msg.data }, "*");
+    } else if (msg.type === "WEB3_ERROR") {
+        // 发送错误消息回 DApp
+        window.postMessage({ type: "WEB3_ERROR", error: msg.error }, "*");
+    }
+});
+
+// 3️⃣ 监听 DApp（网页）发来的 Web3 请求
+window.addEventListener("message", (event) => {
+    if (event.source !== window || !event.data.type) return;
+
+    if (event.data.type === "WEB3_REQUEST") {
+        console.log("🔗 收到网页 Web3 请求:", event.data);
+        
+        // 4️⃣ 转发请求给 `background.js`
+        port.postMessage(event.data);
+    }
+});

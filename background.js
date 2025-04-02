@@ -5,53 +5,25 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.action.openPopup();
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "CONNECT_WALLET") {
-    console.log("DApp 请求连接钱包");
+chrome.runtime.onConnect.addListener((port) => {
+  console.log("🔌 连接成功:", port.name);
 
-    // 打开插件 UI
-    chrome.windows.create({
-      url: "dist/index.html",
-      type: "popup",
-      width: 400,
-      height: 600,
-    });
+  if (port.name === "web3-connection") {
+    port.onMessage.addListener(async (msg) => {
+      console.log("📨 收到消息:", msg);
 
-    // 等待 UI 选择账户后返回
-    chrome.runtime.onMessage.addListener((response) => {
-      if (response.type === "WALLET_CONNECTED") {
-        sendResponse({ accounts: response.accounts });
+      if (msg.type === "WEB3_REQUEST") {
+        // try {
+        //   // 发送成功的响应回 `content_script.js`
+        //   port.postMessage({ type: "WEB3_RESPONSE", data: ["0x8d3633998A91041aD986E751A753c100C792B260"] });
+        // } catch (error) {
+          port.postMessage({ type: "WEB3_ERROR", error: "不支持此消息" });
+        // }
       }
     });
 
-    return true; // 保持消息通道打开
+    port.onDisconnect.addListener(() => {
+      console.log("🔌 连接断开");
+    });
   }
 });
-
-chrome.runtime.onConnect.addListener(function(port) {
-    if (port.name === "content-script") {
-      console.log("Content script connected");
-      // port.postMessage({farewell: "goodbye"});
-      port.onMessage.addListener(function(message) {
-        console.log(message.greeting);
-      });
-    }
-});
-
-chrome.runtime.onUserScriptMessage.addListener((message, sender) => {
-    console.log("📩 background.js 收到 `content_script.js` 消息:", message);
-  
-    if (message.type === "CONNECT_WALLET") {
-      // **模拟返回账户信息**
-      const accounts = ["0x1234567890abcdef"];
-  
-      // **✅ 发送消息回 `content_script.js`**
-      chrome.scripting.executeScript({
-        target: { tabId: sender.tab.id },
-        func: (accounts) => {
-          window.postMessage({ type: "WALLET_CONNECTED", accounts }, "*");
-        },
-        args: [accounts],
-      });
-    }
-  });
