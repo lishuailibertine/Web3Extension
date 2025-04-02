@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "web3app",
+    "version": "1.0",
+    "description": "A Chrome extension built with Vue.js",
+    "action": {
+      "default_popup": "dist/index.html",
+      "default_icon": {}
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+    {
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "js": ["scripts/content.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    }
+    ],
+    "permissions": [
+      "storage",
+      "notifications",
+      "tabs",
+      "activeTab",
+      "scripting"
+    ]
+  }
