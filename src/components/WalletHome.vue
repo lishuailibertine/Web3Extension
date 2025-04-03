@@ -65,7 +65,7 @@ export default {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     margin: 0 auto;
-    margin-top: 44px;
+    margin-top: 80px;
     /* 确保内容不被固定的 header 遮挡 */
 }
 
@@ -80,7 +80,7 @@ export default {
     /* 距离右侧 0 像素 */
     background: white;
     /* 背景颜色 */
-    padding: 10px 20px;
+    padding: 0px 20px;
     /* 内边距 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     /* 阴影效果 */
@@ -92,23 +92,25 @@ export default {
     /* 在主轴上分配空间 */
     align-items: center;
     /* 垂直居中对齐 */
-    height: 44px;
+    height: 80px;
 }
 
 .wallet-name {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
 }
 
 .settings-button {
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 18px;
     cursor: pointer;
 }
 
 .balance-section {
     text-align: center;
+    padding-top: 12px;
+    background-color: white;
 }
 
 .balance {
@@ -128,7 +130,7 @@ export default {
 .currency-title-container {
     position: sticky;
     /* 使标题在滚动时悬浮 */
-    top: 60px;
+    top: 80px;
     /* 距离顶部 60 像素，确保在导航下方 */
     background: white;
     /* 背景颜色 */
