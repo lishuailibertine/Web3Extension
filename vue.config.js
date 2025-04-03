@@ -1,4 +1,9 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
-  transpileDependencies: true
-})
+module.exports = {
+  publicPath: './',
+  outputDir: 'dist', // 输出目录
+  configureWebpack: {
+    output: {
+      filename: '[name].js'
+    }
+  }
+}
