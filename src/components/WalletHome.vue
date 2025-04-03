@@ -136,7 +136,7 @@ export default {
     /* 背景颜色 */
     z-index: 999;
     /* 确保在其他内容之上 */
-    padding: 10px 0;
+    padding: 10px 10px;
     /* 内边距 */
     border-bottom: 2px solid #007bff;
     /* 底部边框 */
