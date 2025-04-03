@@ -21,7 +21,7 @@
     ],
     "web_accessible_resources": [
     {
-      "resources": ["scripts/inject.js"],
+      "resources": ["scripts/inject.js", "scripts/content.js"],
       "matches": ["<all_urls>"],
       "extension_ids": ["*"]
     }
