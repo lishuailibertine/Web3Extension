@@ -136,25 +136,25 @@ export default {
     /* 背景颜色 */
     z-index: 999;
     /* 确保在其他内容之上 */
-    padding: 10px 10px;
-    /* 内边距 */
-    border-bottom: 2px solid #007bff;
+    padding: 0px 10px;
     /* 底部边框 */
+    height: 44px;
+    display: flex; /* 使用 Flexbox 布局 */
+    flex-direction: column; /* 垂直排列 */
 }
 
 .currency-title {
     font-size: 12px;
-    margin: 0;
-    /* 去掉默认的外边距 */
 }
 
 .tab-indicator {
-    width: 50%;
+    width: 100%;
     /* 滑动条的宽度 */
-    height: 4px;
+    height: 2px;
     /* 滑动条的高度 */
-    margin: 0 auto;
     /* 居中对齐 */
+    background-color: gray;
+    margin-bottom: 1px; /* 确保与标题有一定间距 */
 }
 
 .currency-list {
