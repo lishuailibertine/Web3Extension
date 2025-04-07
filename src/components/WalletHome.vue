@@ -79,9 +79,9 @@ export default {
 
         const isSidebarOpen = ref(false); // 控制侧边栏的显示与隐藏
         const wallets = ref([
-            { name: 'Wallet 1', address: '0x123...' },
-            { name: 'Wallet 2', address: '0x456...' },
-            { name: 'Wallet 3', address: '0x789...' }
+            { name: 'Wallet 1', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
+            { name: 'Wallet 2', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
+            { name: 'Wallet 3', address: '0xE2eA51F8C0838284359084997a304039CA2CC4'}
         ]);
         const setActiveTab = (tab) => {
             activeTab.value = tab; // 更新选中的 tab
@@ -293,11 +293,25 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 120px; /* 侧边栏宽度 */
+  width: 200px; /* 侧边栏宽度 */
   height: 100%;
   background-color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  padding: 10px;
   z-index: 1000; /* 确保在其他内容之上 */
+}
+
+.sidebar ul {
+  list-style-type: none; /* 去掉默认的列表样式 */
+  padding: 0; /* 去掉内边距 */
+  margin: 0; /* 去掉外边距 */
+}
+
+.sidebar li {
+  width: 200px; /* 确保 li 元素宽度为100% */
+  padding: 10px; /* 添加内边距 */
+  box-sizing: border-box; /* 确保内边距不会影响总宽度 */
+  border-bottom: 1px solid #ddd; /* 添加底部边框 */
+  overflow: hidden;
 }
 </style>
