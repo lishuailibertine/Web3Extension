@@ -24,14 +24,27 @@
             <div class="tab-indicator" :style="{ left: activeTab === 'currency' ? '0' : '50%' }"></div>
         </div>
 
-        <ul class="currency-list">
-            <li v-for="currency in currencies" :key="currency.id" class="currency-item">
-                <div class="currency-info">
-                    <span class="currency-name">{{ currency.name }}</span>
-                    <span class="currency-balance">{{ currency.balance }} {{ currency.symbol }}</span>
-                </div>
-            </li>
-        </ul>
+        <div v-if="activeTab === 'currency'">
+            <ul class="currency-list">
+                <li v-for="currency in currencies" :key="currency.id" class="currency-item">
+                    <div class="currency-info">
+                        <span class="currency-name">{{ currency.name }}</span>
+                        <span class="currency-balance">{{ currency.balance }} {{ currency.symbol }}</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div v-if="activeTab === 'transaction'">
+            <ul class="transaction-list">
+                <li v-for="transaction in transactions" :key="transaction.id" class="transaction-item">
+                    <div class="transaction-info">
+                        <span class="transaction-description">{{ transaction.description }}</span>
+                        <span class="transaction-amount">{{ transaction.amount }} USD</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -45,6 +58,12 @@ export default {
             { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.5 },
             { id: 2, name: 'Ethereum', symbol: 'ETH', balance: 2 },
             { id: 3, name: 'Litecoin', symbol: 'LTC', balance: 5 }
+        ]);
+
+        const transactions = ref([
+            { id: 1, description: 'Sent 0.1 BTC', amount: 100 },
+            { id: 2, description: 'Received 0.5 ETH', amount: 200 },
+            { id: 3, description: 'Sent 1 LTC', amount: 50 }
         ]);
 
         const activeTab = ref('currency'); // 默认选中的 tab
@@ -66,6 +85,7 @@ export default {
         return {
             balance,
             currencies,
+            transactions,
             sendTransaction,
             openSettings,
             activeTab,
@@ -174,7 +194,8 @@ export default {
     /* 垂直居中对齐 */
 }
 
-.currency-title,.transaction-title {
+.currency-title,
+.transaction-title {
     font-size: 12px;
     margin: 0;
     /* 去掉默认的外边距 */
@@ -206,12 +227,12 @@ export default {
     /* 添加过渡效果 */
 }
 
-.currency-list {
-    list-style-type: none;
-    padding: 0;
+.currency-list, .transaction-list {
+  list-style-type: none;
+  padding: 0;
 }
 
-.currency-item {
+.currency-item, .transaction-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
