@@ -1,7 +1,7 @@
 <template>
     <div class="wallet-container">
         <header class="wallet-header">
-            <h1 class="wallet-name">My Wallet</h1>
+            <h1 class="wallet-name" @click="toggleSidebar">My Wallet</h1>
             <button class="settings-button" @click="openSettings">⚙️</button>
         </header>
 
@@ -45,6 +45,15 @@
                 </li>
             </ul>
         </div>
+
+         <!-- 侧边栏 -->
+      <div class="sidebar" v-if="isSidebarOpen">
+        <h3>Wallets</h3>
+        <ul>
+          <li v-for="wallet in wallets" :key="wallet.name">{{ wallet.name }} - {{ wallet.address }}</li>
+        </ul>
+        <button @click="toggleSidebar">Close</button>
+      </div>
     </div>
 </template>
 
@@ -68,8 +77,18 @@ export default {
 
         const activeTab = ref('currency'); // 默认选中的 tab
 
+        const isSidebarOpen = ref(false); // 控制侧边栏的显示与隐藏
+        const wallets = ref([
+            { name: 'Wallet 1', address: '0x123...' },
+            { name: 'Wallet 2', address: '0x456...' },
+            { name: 'Wallet 3', address: '0x789...' }
+        ]);
         const setActiveTab = (tab) => {
             activeTab.value = tab; // 更新选中的 tab
+        };
+
+        const toggleSidebar = () => {
+            isSidebarOpen.value = !isSidebarOpen.value; // 切换侧边栏的显示状态
         };
 
         const sendTransaction = () => {
@@ -89,7 +108,10 @@ export default {
             sendTransaction,
             openSettings,
             activeTab,
-            setActiveTab
+            setActiveTab,
+            isSidebarOpen,
+            toggleSidebar,
+            wallets
         };
     }
 };
@@ -113,11 +135,11 @@ export default {
     /* 距离顶部 0 像素 */
     left: 0;
     /* 距离左侧 0 像素 */
-    right: 0;
+    /* right: 0; */
     /* 距离右侧 0 像素 */
     background: white;
     /* 背景颜色 */
-    padding: 0px 20px;
+    padding: 0px 0px;
     /* 内边距 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     /* 阴影效果 */
@@ -129,6 +151,7 @@ export default {
     /* 在主轴上分配空间 */
     align-items: center;
     /* 垂直居中对齐 */
+    width: 400px;
     height: 80px;
 }
 
@@ -145,9 +168,11 @@ export default {
 }
 
 .balance-section {
+     /* 确保宽度为100% */
     text-align: center;
     padding-top: 12px;
     background-color: white;
+    width: 400px;
 }
 
 .balance {
@@ -174,7 +199,7 @@ export default {
     z-index: 999;
     /* 确保在其他内容之上 */
     margin-top: 12px;
-    padding: 0px 10px;
+    padding: 0px 0px;
     /* 底部边框 */
     height: 44px;
     display: flex;
@@ -182,6 +207,7 @@ export default {
     flex-direction: column;
     /* 垂直排列 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 400px;
 }
 
 
@@ -230,6 +256,7 @@ export default {
 .currency-list, .transaction-list {
   list-style-type: none;
   padding: 0;
+  width: 400px;
 }
 
 .currency-item, .transaction-item {
@@ -260,5 +287,25 @@ export default {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 120px; /* 侧边栏宽度 */
+  height: 100%;
+  background-color: white;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  z-index: 1000; /* 确保在其他内容之上 */
+}
+
+.sidebar-enter-active, .sidebar-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.sidebar-enter, .sidebar-leave-to {
+  transform: translateX(100%); /* 进入和离开时的状态 */
 }
 </style>
