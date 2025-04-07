@@ -300,12 +300,4 @@ export default {
   padding: 20px;
   z-index: 1000; /* 确保在其他内容之上 */
 }
-
-.sidebar-enter-active, .sidebar-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.sidebar-enter, .sidebar-leave-to {
-  transform: translateX(100%); /* 进入和离开时的状态 */
-}
 </style>
