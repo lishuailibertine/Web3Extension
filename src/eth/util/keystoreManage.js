@@ -92,12 +92,12 @@ class keystoreManage {
     }
   }
   // 5 随机生成一个钱包,并存储在本地
-  async createWallet(walletName) {
+  async createWallet(walletName, password) {
     try {
       const account = this.web3.eth.accounts.create();
       const keystore = await this.web3.eth.accounts.encrypt(
         account.privateKey,
-        walletName
+        password
       );
 
       // 存储 keystore 到 Google 本地存储

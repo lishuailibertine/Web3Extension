@@ -4,6 +4,10 @@
       <h1 class="title">设置钱包密码</h1>
       <p class="description">此密码用于解锁钱包，我们无法为你恢复此密码</p>
       
+        <div class="input-container">
+            <label for="wallet-name">钱包名称</label>
+            <input type="text" id="wallet-name" v-model="walletName" placeholder="请输入钱包名称" />    
+        </div>
       <div class="input-container">
         <label for="password">密码</label>
         <input type="password" id="password" v-model="password" placeholder="最少输入 8 个字符" />
@@ -21,10 +25,13 @@
   <script>
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import keystoreManage from '@/eth/util/keystoreManage';
 export default {
   name: 'WalletConfirmPsd',
   setup() {
     const router = useRouter();
+    // 钱包名字
+    const walletName = ref('MyWallet');
     const password = ref('');
     const confirmPassword = ref('');
 
@@ -32,7 +39,7 @@ export default {
       router.back(); // 返回到上一个页面
     };
 
-    const confirmPasswordSetting = () => {
+    const confirmPasswordSetting = async () => {
       if (password.value.length < 8) {
         alert('密码至少需要 8 个字符');
         return;
@@ -41,8 +48,8 @@ export default {
         alert('两次输入的密码不一致');
         return;
       }
-      // 这里可以添加设置密码的逻辑
-      alert('钱包密码设置成功！');
+      // 随机生成钱包
+      await keystoreManage.createWallet(walletName, password.value);
     };
 
     return {
