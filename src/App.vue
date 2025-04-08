@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import WalletHome from './components/WalletHome.vue';
+import WalletHome from './components/home/WalletHome.vue';
 export default {
   components: { WalletHome },
   name: 'App'
@@ -15,7 +15,5 @@ export default {
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  width: 400px;
-  height: 750px;
 }
 </style>

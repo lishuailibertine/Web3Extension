@@ -1,8 +1,18 @@
-// src/router.js
 import { createRouter, createWebHistory } from 'vue-router';
-import WalletHome from '@/components/WalletHome.vue'; // 导入 WalletHome 组件
+import WalletHome from '../components/home/WalletHome.vue'; // 确保路径正确
+import WalletImport from '../components/import/WalletImport.vue'; // 确保路径正确
 
 const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: WalletHome
+  },
+  {
+    path: '/walletimport',
+    name: 'WalletImport',
+    component: WalletImport
+  },
   {
     path: '/wallethome',
     name: 'WalletHome',

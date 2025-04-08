@@ -91,6 +91,33 @@ class keystoreManage {
       return { success: false, message: error.message };
     }
   }
+  // 5 随机生成一个钱包,并存储在本地
+  async createWallet(walletName) {
+    try {
+      const account = this.web3.eth.accounts.create();
+      const keystore = await this.web3.eth.accounts.encrypt(
+        account.privateKey,
+        walletName
+      );
+
+      // 存储 keystore 到 Google 本地存储
+      localStorage.setItem(walletName, JSON.stringify(keystore));
+      //把钱包名字,，单独放在容器中
+      const walletNames = localStorage.getItem(this.walletKey);
+      if (!walletNames) {
+        localStorage.setItem(this.walletKey, JSON.stringify([walletName]));
+      } else {
+        const wallets = JSON.parse(walletNames);
+        if (!wallets.includes(walletName)) {
+          wallets.push(walletName);
+          localStorage.setItem(this.walletKey, JSON.stringify(wallets));
+        }
+      }
+      return { success: true, address: account.address };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
 }
 
 export default new keystoreManage();

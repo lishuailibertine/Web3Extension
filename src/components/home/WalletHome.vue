@@ -59,9 +59,11 @@
 
 <script>
 import { ref } from 'vue';
-
+import { useRouter } from 'vue-router';
 export default {
+    name: 'WalletHome',
     setup() {
+        const router = useRouter();
         const balance = ref(1000); // 使用 ref 创建响应式变量
         const currencies = ref([
             { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.5 },
@@ -94,6 +96,7 @@ export default {
         const sendTransaction = () => {
             alert('Send transaction functionality goes here.');
             // 这里可以添加发送转账的逻辑
+            router.push({ name: 'WalletImport' });
         };
 
         const openSettings = () => {
@@ -139,18 +142,19 @@ export default {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
+    width: 400px;
+    height: 750px;
     margin: 0 auto;
     margin-top: 80px;
+    /* align-items: center; */
     /* 确保内容不被固定的 header 遮挡 */
 }
 
 .wallet-header {
     position: fixed;
     /* 固定在顶部 */
-    top: 0;
+    margin-top: -80px;
     /* 距离顶部 0 像素 */
-    left: 0;
     /* 距离左侧 0 像素 */
     /* right: 0; */
     /* 距离右侧 0 像素 */
@@ -168,6 +172,7 @@ export default {
     /* 在主轴上分配空间 */
     align-items: center;
     /* 垂直居中对齐 */
+    width: 100%;
     width: 400px;
     height: 80px;
     box-sizing: border-box;
@@ -190,7 +195,7 @@ export default {
     text-align: center;
     padding-top: 12px;
     background-color: white;
-    width: 400px;
+    width: 100%;
 }
 
 .balance {
@@ -225,7 +230,7 @@ export default {
     flex-direction: column;
     /* 垂直排列 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 400px;
+    width: 100%;
 }
 
 
@@ -275,7 +280,7 @@ export default {
 .transaction-list {
     list-style-type: none;
     padding: 0;
-    width: 400px;
+    width: 100%;
 }
 
 .currency-item,
@@ -318,7 +323,7 @@ export default {
     position: fixed;
     top: 0;
     left: 0;
-    width: 160px;
+    width: 40%;
     /* 侧边栏宽度 */
     height: 100%;
     background-color: white;
@@ -338,7 +343,7 @@ export default {
 }
 
 .sidebar li {
-    width: 160px;
+    width: 100%;
     /* 确保 li 元素宽度为100% */
     padding: 10px;
     /* 添加内边距 */
