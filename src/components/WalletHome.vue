@@ -1,13 +1,13 @@
 <template>
-    <div class="wallet-container">
+    <div class="wallet-container" @click="handleClickOutside">
         <header class="wallet-header">
-            <h1 class="wallet-name" @click="toggleSidebar">My Wallet</h1>
-            <button class="settings-button" @click="openSettings">⚙️</button>
+            <h1 class="wallet-name" @click.stop="toggleSidebar">My Wallet</h1>
+            <button class="settings-button" @click="handleButtonClick(openSettings)">⚙️</button>
         </header>
 
         <div class="balance-section">
             <h2 class="balance">Balance: {{ balance }} USD</h2>
-            <button class="send-button" @click="sendTransaction">Send</button>
+            <button class="send-button" @click="handleButtonClick(sendTransaction)">Send</button>
         </div>
 
         <div class="currency-title-container">
@@ -46,14 +46,14 @@
             </ul>
         </div>
 
-         <!-- 侧边栏 -->
-      <div class="sidebar" v-if="isSidebarOpen">
-        <h3>Wallets</h3>
-        <ul>
-          <li v-for="wallet in wallets" :key="wallet.name">{{ wallet.name }} - {{ wallet.address }}</li>
-        </ul>
-        <button @click="toggleSidebar">Close</button>
-      </div>
+        <!-- 侧边栏 -->
+        <div class="sidebar" v-if="isSidebarOpen">
+            <h3>Wallets</h3>
+            <ul>
+                <li v-for="wallet in wallets" :key="wallet.name">{{ wallet.name }} - {{ wallet.address }}</li>
+            </ul>
+            <button class="closebutton" @click="toggleSidebar">Close</button>
+        </div>
     </div>
 </template>
 
@@ -81,7 +81,7 @@ export default {
         const wallets = ref([
             { name: 'Wallet 1', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
             { name: 'Wallet 2', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
-            { name: 'Wallet 3', address: '0xE2eA51F8C0838284359084997a304039CA2CC4'}
+            { name: 'Wallet 3', address: '0xE2eA51F8C0838284359084997a304039CA2CC4' }
         ]);
         const setActiveTab = (tab) => {
             activeTab.value = tab; // 更新选中的 tab
@@ -97,10 +97,25 @@ export default {
         };
 
         const openSettings = () => {
-            alert('Settings functionality goes here.');
             // 这里可以添加打开设置的逻辑
+            alert('Open settings functionality goes here.');
+        };
+        const handleClickOutside = (event) => {
+            const sidebar = document.querySelector('.sidebar');
+            if (isSidebarOpen.value && sidebar && !sidebar.contains(event.target)) {
+                isSidebarOpen.value = false; // 点击侧边栏以外的地方关闭侧边栏
+            }
         };
 
+        const handleButtonClick = (action) => {
+            if (isSidebarOpen.value) {
+                isSidebarOpen.value = false; // 关闭侧边栏
+            }
+            // 使用 setTimeout 确保侧边栏关闭后再执行操作
+            setTimeout(() => {
+                action(); // 执行传入的操作
+            }, 100); // 100毫秒的延迟，确保侧边栏关闭
+        };
         return {
             balance,
             currencies,
@@ -111,7 +126,9 @@ export default {
             setActiveTab,
             isSidebarOpen,
             toggleSidebar,
-            wallets
+            wallets,
+            handleClickOutside,
+            handleButtonClick
         };
     }
 };
@@ -139,7 +156,7 @@ export default {
     /* 距离右侧 0 像素 */
     background: white;
     /* 背景颜色 */
-    padding: 0px 0px;
+    padding: 0px 12px;
     /* 内边距 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     /* 阴影效果 */
@@ -153,6 +170,7 @@ export default {
     /* 垂直居中对齐 */
     width: 400px;
     height: 80px;
+    box-sizing: border-box;
 }
 
 .wallet-name {
@@ -168,7 +186,7 @@ export default {
 }
 
 .balance-section {
-     /* 确保宽度为100% */
+    /* 确保宽度为100% */
     text-align: center;
     padding-top: 12px;
     background-color: white;
@@ -253,18 +271,25 @@ export default {
     /* 添加过渡效果 */
 }
 
-.currency-list, .transaction-list {
-  list-style-type: none;
-  padding: 0;
-  width: 400px;
+.currency-list,
+.transaction-list {
+    list-style-type: none;
+    padding: 0;
+    width: 400px;
 }
 
-.currency-item, .transaction-item {
+.currency-item,
+.transaction-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.currency-item:hover,
+.transaction-item:hover {
+    background-color: #f0f0f0;
 }
 
 .currency-info {
@@ -290,28 +315,53 @@ export default {
 }
 
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200px; /* 侧边栏宽度 */
-  height: 100%;
-  background-color: white;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  padding: 10px;
-  z-index: 1000; /* 确保在其他内容之上 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 160px;
+    /* 侧边栏宽度 */
+    height: 100%;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    z-index: 1000;
+    /* 确保在其他内容之上 */
 }
 
 .sidebar ul {
-  list-style-type: none; /* 去掉默认的列表样式 */
-  padding: 0; /* 去掉内边距 */
-  margin: 0; /* 去掉外边距 */
+    list-style-type: none;
+    /* 去掉默认的列表样式 */
+    padding: 0;
+    /* 去掉内边距 */
+    margin: 0;
+    /* 去掉外边距 */
 }
 
 .sidebar li {
-  width: 200px; /* 确保 li 元素宽度为100% */
-  padding: 10px; /* 添加内边距 */
-  box-sizing: border-box; /* 确保内边距不会影响总宽度 */
-  border-bottom: 1px solid #ddd; /* 添加底部边框 */
-  overflow: hidden;
+    width: 160px;
+    /* 确保 li 元素宽度为100% */
+    padding: 10px;
+    /* 添加内边距 */
+    box-sizing: border-box;
+    /* 确保内边距不会影响总宽度 */
+    border-bottom: 1px solid #ddd;
+    /* 添加底部边框 */
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* 鼠标悬停时的样式 */
+.sidebar li:hover {
+    background-color: #f0f0f0;
+    /* 鼠标悬停时的背景颜色 */
+}
+
+.closebutton {
+    background: white;
+    border: orange;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 10px;
+    /* 添加顶部外边距 */
 }
 </style>
