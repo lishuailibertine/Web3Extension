@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import WalletHome from '../components/home/WalletHome.vue'; // 确保路径正确
 import WalletImport from '../components/import/WalletImport.vue'; // 确保路径正确
 
@@ -21,7 +21,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 });
 

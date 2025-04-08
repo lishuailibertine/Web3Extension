@@ -64,6 +64,9 @@ export default {
     name: 'WalletHome',
     setup() {
         const router = useRouter();
+        const navigateToWalletImport = () => {
+         router.push({ name: 'WalletImport' });
+        };
         const balance = ref(1000); // 使用 ref 创建响应式变量
         const currencies = ref([
             { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.5 },
@@ -94,9 +97,7 @@ export default {
         };
 
         const sendTransaction = () => {
-            alert('Send transaction functionality goes here.');
-            // 这里可以添加发送转账的逻辑
-            router.push({ name: 'WalletImport' });
+            navigateToWalletImport(); // 跳转到导入钱包页面
         };
 
         const openSettings = () => {

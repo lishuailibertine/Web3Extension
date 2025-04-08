@@ -36,7 +36,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* 使容器充满视口高度 */
+    width: 400px;
+    height: 750px; /* 使容器充满视口高度 */
     background-color: #f9f9f9; /* 背景颜色 */
   }
   
@@ -46,7 +47,7 @@
   
   .create-wallet-button,
   .import-wallet-button {
-    padding: 10px 20px;
+    padding: 10px 10px;
     margin: 10px; /* 按钮之间的间距 */
     font-size: 16px;
     color: white;
