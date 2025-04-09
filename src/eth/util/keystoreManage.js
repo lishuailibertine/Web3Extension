@@ -4,7 +4,6 @@ import { openDB } from 'idb';
 class keystoreManage {
   constructor() {
     this.web3 = new Web3();
-    this.initDB(); // 初始化数据库
   }
 
   async initDB() {
