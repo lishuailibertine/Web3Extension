@@ -16,10 +16,25 @@ const handleRuntimeMessage = () => {
                 console.error("Error getting wallets:", error);
                 sendResponse({ error: "Failed to get wallets." });
             });
-            return true;
-        } else {
+        }
+        else if (msg.method === "eth_sign") {
+        }
+        else if (msg.method === "eth_sendTransaction") {
+        }
+        else if (msg.method === "eth_signTypedData") {
+        }
+        else if (msg.method === "eth_call") {
+        }
+        else if (msg.method === "personal_sign") {
+        }
+        else if (msg.method === "eth_chainId") {
+            sendResponse("0x38");
+        }
+        else {
+            alert(msg.method);
             sendResponse({ error: "unkonw error" });
         }
+        return true;
       });
     }
   };
