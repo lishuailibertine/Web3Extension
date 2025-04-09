@@ -1,7 +1,7 @@
 <template>
     <div class="wallet-container" @click="handleClickOutside">
         <header class="wallet-header">
-            <h1 class="wallet-name" @click.stop="toggleSidebar">My Wallet</h1>
+            <h1 class="wallet-name" @click.stop="toggleSidebar">{{walletName}}</h1>
             <button class="settings-button" @click="handleButtonClick(openSettings)">⚙️</button>
         </header>
 
@@ -64,6 +64,7 @@ import keystoreManage from '@/eth/util/keystoreManage';
 export default {
     name: 'WalletHome',
     setup() {
+        const walletName = ref(localStorage.getItem("selectedWallet")); // 钱包名称
         const balance = ref(1000); // 使用 ref 创建响应式变量
         const currencies = ref([
             { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.6 },
@@ -124,6 +125,7 @@ export default {
         init(); // 初始化钱包列表
         // 监听点击事件
         return {
+            walletName,
             balance,
             currencies,
             transactions,
@@ -185,6 +187,9 @@ export default {
 .wallet-name {
     font-size: 18px;
     font-weight: bold;
+    width: 100px;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .settings-button {
