@@ -60,34 +60,35 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import keystoreManage from '@/eth/util/keystoreManage';
 export default {
     name: 'WalletHome',
     setup() {
-        const router = useRouter();
-        const navigateToWalletImport = () => {
-         router.push({ name: 'WalletImport' });
-        };
         const balance = ref(1000); // 使用 ref 创建响应式变量
         const currencies = ref([
-            { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.5 },
+            { id: 1, name: 'Bitcoin', symbol: 'BTC', balance: 0.6 },
             { id: 2, name: 'Ethereum', symbol: 'ETH', balance: 2 },
             { id: 3, name: 'Litecoin', symbol: 'LTC', balance: 5 }
         ]);
 
         const transactions = ref([
             { id: 1, description: 'Sent 0.1 BTC', amount: 100 },
-            { id: 2, description: 'Received 0.5 ETH', amount: 200 },
+            { id: 2, description: 'Received 0.6 ETH', amount: 200 },
             { id: 3, description: 'Sent 1 LTC', amount: 50 }
         ]);
 
         const activeTab = ref('currency'); // 默认选中的 tab
-
+        const wallets = ref([]); // 钱包列表
         const isSidebarOpen = ref(false); // 控制侧边栏的显示与隐藏
-        const wallets = ref([
-            { name: 'Wallet 1', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
-            { name: 'Wallet 2', address: '0xE2eA51F8C0838284359084997a304039CA2CC423' },
-            { name: 'Wallet 3', address: '0xE2eA51F8C0838284359084997a304039CA2CC4' }
-        ]);
+        const init = async () => {
+            const allWallets = await keystoreManage.getAllWallets(); // 获取钱包列表
+            console.log(allWallets);
+            wallets.value = allWallets.wallets.map(wallet => ({
+                name: wallet.walletName,
+                address: wallet.address
+             })); // 使用 ref 创建响应式变量
+         };
+       
         const setActiveTab = (tab) => {
             activeTab.value = tab; // 更新选中的 tab
         };
@@ -97,7 +98,7 @@ export default {
         };
 
         const sendTransaction = () => {
-            navigateToWalletImport(); // 跳转到导入钱包页面
+
         };
 
         const openSettings = () => {
@@ -120,6 +121,8 @@ export default {
                 action(); // 执行传入的操作
             }, 100); // 100毫秒的延迟，确保侧边栏关闭
         };
+        init(); // 初始化钱包列表
+        // 监听点击事件
         return {
             balance,
             currencies,

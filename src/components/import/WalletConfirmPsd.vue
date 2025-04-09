@@ -49,10 +49,14 @@ export default {
         return;
       }
       // 随机生成钱包
-      await keystoreManage.createWallet(walletName, password.value);
+      await keystoreManage.createWallet(walletName.value, password.value);
+
+      //钱包创建完毕 跳转到首页
+      router.push({ name: 'WalletHome' });
     };
 
     return {
+      walletName,
       password,
       confirmPassword,
       goBack,
