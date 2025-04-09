@@ -33,7 +33,6 @@ chrome.runtime.onConnect.addListener((port) => {
             port.postMessage({type: "WEB3_RESPONSE", data: response });
           }
         }).catch((error) => {
-          console.error("Error:", error);
           port.postMessage({ type: "WEB3_ERROR", error: "不支持此消息" });
         });
       }

@@ -16,6 +16,7 @@ const handleRuntimeMessage = () => {
                 console.error("Error getting wallets:", error);
                 sendResponse({ error: "Failed to get wallets." });
             });
+            return true;
         } else {
             sendResponse({ error: "unkonw error" });
         }
