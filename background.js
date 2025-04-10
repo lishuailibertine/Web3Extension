@@ -2,14 +2,17 @@
 let popupWindowId = null;
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
-  chrome.action.openPopup();
+  chrome.action.openPopup(); // 可选，用户安装时弹出
 });
 
+// 通信桥
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "web3-connection") {
     port.onMessage.addListener(async (msg) => {
       if (msg.type === "WEB3_REQUEST") {
-        // 应该先弹出来插件
+        const { method, params, id } = msg;
+
+        // 弹出窗口
         if (popupWindowId !== null) {
           chrome.windows.get(popupWindowId, (win) => {
             if (chrome.runtime.lastError || !win) {
@@ -21,29 +24,57 @@ chrome.runtime.onConnect.addListener((port) => {
         } else {
           openPopup();
         }
-        chrome.runtime.sendMessage({
-          method: msg.method,
-          data: msg.params,
-        }).then((response) => {
-          console.log("Response from popup:", response);
-          if (response.error) {
-            port.postMessage({ type: "WEB3_ERROR", error: response.error });
-            return;
-          } else {
-            port.postMessage({type: "WEB3_RESPONSE", data: response });
-          }
-        }).catch((error) => {
-          port.postMessage({ type: "WEB3_ERROR", error: "不支持此消息" });
-        });
+
+        // 向 popup 页面发送消息
+        chrome.runtime
+          .sendMessage({ method, data: params })
+          .then((response) => {
+            if (response && response.error) {
+              port.postMessage({
+                type: "WEB3_ERROR",
+                id: id, // 添加 id
+                error: response.error,
+              });
+            } else {
+              port.postMessage({
+                type: "WEB3_RESPONSE",
+                id: id, // 添加 id
+                data: response,
+              });
+            }
+          })
+          .catch((error) => {
+            port.postMessage({
+              type: "WEB3_ERROR",
+              id: id,
+              error: error.message || "Unknown error",
+            });
+          });
       }
     });
 
     port.onDisconnect.addListener(() => {
-      console.error("🔌 连接断开");
+      console.error("🔌 Port disconnected");
     });
   }
 });
 
+// 可被 popup 主动调用，向 tab 页面派发事件（比如账号切换）
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.type === "TRIGGER_EVENT") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      for (const tab of tabs) {
+        chrome.tabs.sendMessage(tab.id, {
+          type: "WEB3_EVENT",
+          event: msg.event,
+          data: msg.data,
+        });
+      }
+    });
+  }
+  sendResponse(); // 避免报错
+  return true;
+});
 
 function openPopup() {
   chrome.windows.create(
@@ -55,7 +86,6 @@ function openPopup() {
     },
     (win) => {
       popupWindowId = win.id;
-      // 监听窗口关闭
       chrome.windows.onRemoved.addListener((closedId) => {
         if (closedId === popupWindowId) {
           popupWindowId = null;

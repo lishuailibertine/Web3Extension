@@ -1,42 +1,67 @@
 import keystoreManage from "./keystoreManage";
+
 const handleRuntimeMessage = () => {
-    if (chrome?.runtime?.onMessage) {
-      chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        if (msg.method === "eth_requestAccounts" || msg.method === "eth_accounts") {
-            // 获取所有钱包地址
-            keystoreManage.getAllWallets().then((res) => {
-                const wallets = res.wallets;
-                if (wallets && wallets.length > 0) {
-                const addresses = wallets.map(wallet => wallet.address);
-                sendResponse(addresses);
-                } else {
-                sendResponse([]);
-                }
-            }).catch((error) => {
-                console.error("Error getting wallets:", error);
-                sendResponse({ error: "Failed to get wallets." });
-            });
+  if (chrome?.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      const { method, data } = msg;
+
+      // Helper 函数：统一发送结果
+      const reply = (result, error) => {
+        if (error) {
+          sendResponse({ error });
+        } else {
+          sendResponse(result);
         }
-        else if (msg.method === "eth_sign") {
-        }
-        else if (msg.method === "eth_sendTransaction") {
-        }
-        else if (msg.method === "eth_signTypedData") {
-        }
-        else if (msg.method === "eth_call") {
-        }
-        else if (msg.method === "personal_sign") {
-        }
-        else if (msg.method === "eth_chainId") {
-            sendResponse("0x38");
-        }
-        else {
-            alert(msg.method);
-            sendResponse({ error: "unkonw error" });
-        }
-        return true;
-      });
-    }
-  };
-  
-  export default handleRuntimeMessage;
+      };
+
+      if (method === "eth_requestAccounts" || method === "eth_accounts") {
+        keystoreManage.getAllWallets().then((res) => {
+          const wallets = res.wallets;
+          const addresses = wallets?.map((w) => w.address) || [];
+          // 主动触发 accountsChanged 事件
+          chrome.runtime.sendMessage({
+            type: "WEB3_EVENT",
+            event: "accountsChanged",
+            data: addresses,
+          });
+          reply(addresses);
+        }).catch((err) => {
+          reply(null, "Failed to get wallets.");
+        });
+
+      } else if (method === "eth_chainId") {
+        const chainId = "0x38"; // BSC
+        chrome.runtime.sendMessage({
+          type: "WEB3_EVENT",
+          event: "chainChanged",
+          data: chainId,
+        });
+        reply(chainId);
+
+      } else if (method === "eth_sign") {
+        // 示例处理（实际按你逻辑补上）
+        reply(null, "eth_sign not implemented");
+
+      } else if (method === "eth_sendTransaction") {
+        reply(null, "eth_sendTransaction not implemented");
+
+      } else if (method === "eth_signTypedData") {
+        reply(null, "eth_signTypedData not implemented");
+
+      } else if (method === "eth_call") {
+        reply(null, "eth_call not implemented");
+
+      } else if (method === "personal_sign") {
+        reply(null, "personal_sign not implemented");
+
+      } else {
+        console.warn("Unknown method:", method);
+        reply(null, "Unknown method: " + method);
+      }
+
+      return true; // 异步响应
+    });
+  }
+};
+
+export default handleRuntimeMessage;
