@@ -13,19 +13,24 @@ chrome.runtime.onConnect.addListener((port) => {
       if (msg.type === "WEB3_REQUEST") {
         const { method, params, id } = msg;
 
-        // 弹出窗口
-        if (popupWindowId !== null) {
-          chrome.windows.get(popupWindowId, (win) => {
-            if (chrome.runtime.lastError || !win) {
-              openPopup();
-            } else {
-              chrome.windows.update(popupWindowId, { focused: true });
-            }
-          });
-        } else {
-          openPopup();
-        }
+        if (method === "eth_accounts" || method === "eth_requestAccounts") {
+          // 弹出窗口
+          if (popupWindowId !== null) {
+            chrome.windows.get(popupWindowId, (win) => {
+              if (chrome.runtime.lastError || !win) {
+                openPopup();
+              } else {
+                chrome.windows.update(popupWindowId, { focused: true });
+              }
+            });
+          } else {
+            openPopup();
+          }
+        } 
 
+        if (method === "closePopup") {
+          closePopup();
+        }
         // 向 popup 页面发送消息
         chrome.runtime
           .sendMessage({ method, data: params })
@@ -50,7 +55,7 @@ chrome.runtime.onConnect.addListener((port) => {
               id: id,
               error: error.message || "Unknown error",
             });
-          });
+          })
       }
     });
 

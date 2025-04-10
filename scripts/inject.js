@@ -23,6 +23,9 @@
           if (type === "WEB3_RESPONSE" && responseId === id) {
             window.removeEventListener("message", handler);
             resolve(data);
+            // 关闭弹窗
+            window.postMessage({ type: "WEB3_REQUEST", method: "closePopup" }, "*");
+
           } else if (type === "WEB3_ERROR" && responseId === id) {
             window.removeEventListener("message", handler);
             reject(error);
