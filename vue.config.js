@@ -6,7 +6,7 @@ module.exports = {
   outputDir: 'dist', // 输出目录
   pages: {
     app: {
-      entry: 'src/main.js',
+      entry: 'src/app/main.js',
       template: 'public/app/index.html',
       filename: 'index.html'
     },
