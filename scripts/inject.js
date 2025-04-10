@@ -50,7 +50,9 @@
 
     removeListener(eventName, listener) {
       if (this._events[eventName]) {
-        this._events[eventName] = this._events[eventName].filter((l) => l !== listener);
+        this._events[eventName] = this._events[eventName].filter(
+          (l) => l !== listener
+        );
       }
     }
 
@@ -66,7 +68,17 @@
       }
     }
   }
+  window.addEventListener("message", (event) => {
+    if (event.source !== window || !event.data.type) return;
 
+    if (event.data.type === "WEB3_EVENT") {
+      const { event: eventName, data } = event.data;
+      if (window.ethereum && typeof window.ethereum._emit === "function") {
+        window.ethereum._emit(eventName, data); // ✅ 正确触发注入钱包事件
+      }
+    }
+  });
+  
   const provider = new MyWeb3Provider();
   Object.defineProperty(window, "ethereum", {
     configurable: false,
