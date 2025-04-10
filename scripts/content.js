@@ -10,11 +10,11 @@ const port = chrome.runtime.connect({ name: "web3-connection" });
 
 port.onMessage.addListener((msg) => {
   if (msg.type === "WEB3_RESPONSE") {
-    window.postMessage({ type: "WEB3_RESPONSE", responseId: msg.id, data: msg.data }, "*");
+    window.postMessage({ type: msg.type, responseId: msg.id, data: msg.data }, "*");
   } else if (msg.type === "WEB3_ERROR") {
-    window.postMessage({ type: "WEB3_ERROR", responseId: msg.id, error: msg.error }, "*");
+    window.postMessage({ type: msg.type, responseId: msg.id, error: msg.error }, "*");
   } else if (msg.type === "WEB3_EVENT") {
-    window.postMessage({ type: "WEB3_EVENT", event: msg.event, data: msg.data }, "*");
+    window.postMessage({ type: msg.type, event: msg.event, data: msg.data }, "*");
   }
 });
 

@@ -31,15 +31,15 @@ chrome.runtime.onConnect.addListener((port) => {
           .then((response) => {
             if (response && response.error) {
               port.postMessage({
-                type: "WEB3_ERROR",
+                type: response.type,
                 id: id, // 添加 id
                 error: response.error,
               });
             } else {
               port.postMessage({
-                type: "WEB3_RESPONSE",
+                type: response.type,
                 id: id, // 添加 id
-                data: response,
+                data: response.data,
               });
             }
           })
@@ -59,17 +59,16 @@ chrome.runtime.onConnect.addListener((port) => {
   }
 });
 
-// 可被 popup 主动调用，向 tab 页面派发事件（比如账号切换）
+// 可被 popup 主动调用，
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === "TRIGGER_EVENT") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      for (const tab of tabs) {
-        chrome.tabs.sendMessage(tab.id, {
-          type: "WEB3_EVENT",
-          event: msg.event,
-          data: msg.data,
-        });
-      }
+  if (msg.type === "WEB3_EVENT") {
+    const { event, data } = msg;
+    console.log("Event received:", event, data);
+    // 处理事件
+    port.postMessage({
+      type: msg.type,
+      event: event,
+      data: data,
     });
   }
   sendResponse(); // 避免报错

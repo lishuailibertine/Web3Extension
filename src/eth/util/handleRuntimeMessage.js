@@ -24,19 +24,19 @@ const handleRuntimeMessage = () => {
             event: "accountsChanged",
             data: addresses,
           });
-          reply(addresses);
+          reply({type: "WEB3_RESPONSE", data: addresses});
         }).catch((err) => {
           reply(null, "Failed to get wallets.");
         });
 
       } else if (method === "eth_chainId") {
         const chainId = "0x38"; // BSC
-        chrome.runtime.sendMessage({
-          type: "WEB3_EVENT",
-          event: "chainChanged",
-          data: chainId,
-        });
-        reply(chainId);
+        // chrome.runtime.sendMessage({
+        //   type: "WEB3_EVENT",
+        //   event: "chainChanged",
+        //   data: chainId,
+        // });
+        reply({type: "WEB3_RESPONSE", data: chainId});
 
       } else if (method === "eth_sign") {
         // 示例处理（实际按你逻辑补上）
