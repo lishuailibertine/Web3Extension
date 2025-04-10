@@ -4,10 +4,11 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
   chrome.action.openPopup(); // 可选，用户安装时弹出
 });
-
+let port = null; // 初始化为 null
 // 通信桥
 chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === "web3-connection") {
+  port = port; // 赋值给全局变量
+  if (port && port.name === "web3-connection") {
     port.onMessage.addListener(async (msg) => {
       if (msg.type === "WEB3_REQUEST") {
         const { method, params, id } = msg;
@@ -54,7 +55,7 @@ chrome.runtime.onConnect.addListener((port) => {
     });
 
     port.onDisconnect.addListener(() => {
-      console.error("🔌 Port disconnected");
+      port = null; // 清空 port
     });
   }
 });
@@ -65,11 +66,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const { event, data } = msg;
     console.log("Event received:", event, data);
     // 处理事件
-    port.postMessage({
-      type: msg.type,
-      event: event,
-      data: data,
-    });
+    if (port) {
+      port.postMessage({
+        type: msg.type,
+        event: event,
+        data: data,
+      });
+    }
   }
   sendResponse(); // 避免报错
   return true;
