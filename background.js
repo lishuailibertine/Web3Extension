@@ -93,3 +93,12 @@ function openPopup() {
     }
   );
 }
+
+// 关闭弹出窗口的函数
+function closePopup() {
+  if (popupWindowId !== null) {
+    chrome.windows.remove(popupWindowId, () => {
+      popupWindowId = null; // 关闭后清空 ID
+    });
+  }
+}
