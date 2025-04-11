@@ -84,7 +84,18 @@ class keystoreManage {
       return { success: false, message: error.message };
     }
   }
-
+  // 根据地址获取keystore
+  async getKeystore(address) {
+    try {
+      const keystore = await this.db.get('keystores', address);
+      if (!keystore) {
+        throw new Error("Keystore not found.");
+      }
+      return { success: true, keystore:  keystore};
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
   // 获取所有钱包列表(钱包名字，钱包地址)
   async getAllWallets() {
     try {
