@@ -1,5 +1,5 @@
 (() => {
-  if (window.ethereum && !window.ethereum.isMyWallet) {
+  if (window.ethereum  && !window.ethereum.isMyWallet) {
     delete window.ethereum;
   }
 
@@ -24,8 +24,10 @@
             window.removeEventListener("message", handler);
             resolve(data);
             // 关闭弹窗
-            window.postMessage({ type: "WEB3_REQUEST", method: "closePopup" }, "*");
-
+            window.postMessage(
+              { type: "WEB3_REQUEST", method: "closePopup" },
+              "*"
+            );
           } else if (type === "WEB3_ERROR" && responseId === id) {
             window.removeEventListener("message", handler);
             reject(error);
@@ -81,11 +83,13 @@
       }
     }
   });
-  
-  const provider = new MyWeb3Provider();
-  Object.defineProperty(window, "ethereum", {
-    configurable: false,
-    writable: false,
-    value: provider,
-  });
+
+  const descriptor = Object.getOwnPropertyDescriptor(window, "ethereum");
+  if (descriptor && descriptor.configurable) {
+    Object.defineProperty(window, "ethereum", {
+      configurable: false,
+      writable: false,
+      value: provider,
+    });
+  }
 })();

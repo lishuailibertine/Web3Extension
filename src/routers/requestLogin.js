@@ -5,7 +5,7 @@ import handleRuntimeMessage from '@/eth/util/handleRuntimeMessage';
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'requestLogin',
     component: requestLogin
   }
 ];
@@ -18,5 +18,6 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   await keystoreManage.initDB(); // 初始化数据库
   handleRuntimeMessage(); // 处理消息
+  next();
 });
 export default router;

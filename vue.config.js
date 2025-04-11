@@ -28,9 +28,6 @@ module.exports = {
       chunkFilename: "js/[name].js"
     },
     optimization: {
-      splitChunks: false 
-    },
-    optimization: {
       minimize: false, 
       minimizer: [
         new TerserPlugin({
