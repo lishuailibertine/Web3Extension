@@ -1,19 +1,27 @@
-if (!globalThis.__web3_content_loaded__) {
-  globalThis.__web3_content_loaded__ = true;
 
-  if (!document.getElementById("web3-inject-script")) {
-    const script = document.createElement("script");
-    script.id = "web3-inject-script";
-    script.src = chrome.runtime.getURL("scripts/inject.js");
-    (document.head || document.documentElement).appendChild(script);
+let port = null;
+injectScript();
+function injectScript() {
+  try {
+    const container = document.head || document.documentElement;
+    const scriptTag = document.createElement('script');
+
+    scriptTag.src = chrome.runtime.getURL('scripts/inject.js');
+    scriptTag.type = 'text/javascript';
+    scriptTag.async = false;
+    scriptTag.onload = function () {
+      scriptTag.remove(); // 保持干净
+    };
+
+    container.insertBefore(scriptTag, container.children[0]);
+  } catch (e) {
+    console.error('MetaMask injection failed', e);
   }
   keepAlive();
 }
-
 function keepAlive() {
   try {
-    const port = chrome.runtime.connect({ name: "web3-connection" });
-
+    port = chrome.runtime.connect({ name: "web3-connection" });
     port.onMessage.addListener((msg) => {
       if (msg.type === "PORT_ID") {
         console.log("[Connected] Port ID:", msg.portId);

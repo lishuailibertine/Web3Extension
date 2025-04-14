@@ -21,16 +21,11 @@
 
           const { type, responseId, data, error } = event.data;
           if (type === "WEB3_RESPONSE" && responseId === id) {
-            window.removeEventListener("message", handler);
             resolve(data);
-            // 关闭弹窗
-            window.postMessage(
-              { type: "WEB3_REQUEST", method: "closePopup" },
-              "*"
-            );
-          } else if (type === "WEB3_ERROR" && responseId === id) {
             window.removeEventListener("message", handler);
+          } else if (type === "WEB3_ERROR" && responseId === id) {
             reject(error);
+            window.removeEventListener("message", handler);
           }
         };
 
@@ -79,7 +74,7 @@
     if (event.data.type === "WEB3_EVENT") {
       const { event: eventName, data } = event.data;
       if (window.ethereum && typeof window.ethereum._emit === "function") {
-        window.ethereum._emit(eventName, data); // ✅ 正确触发注入钱包事件
+        window.ethereum._emit(eventName, data);
       }
     }
   });
@@ -89,4 +84,5 @@
     writable: false,
     value: provider,
   });
+  window.dispatchEvent(new Event("ethereum#initialized"));
 })();

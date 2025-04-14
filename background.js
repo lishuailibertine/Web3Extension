@@ -6,7 +6,7 @@ let portPool = new Map(); // ✅ 用于存储连接的 port
 let isProcessing = false;
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
-  // chrome.action.openPopup(); // 可选，用户安装时弹出
+  chrome.action.openPopup(); // 可选，用户安装时弹出
 });
 async function handleNextRequest() {
   if (requestQueue.length === 0) return;
@@ -96,7 +96,7 @@ function openPopup(requestId) {
     {
       url: url,
       type: "popup",
-      width: 420,
+      width: 300,
       height: 620,
     },
     (win) => {
