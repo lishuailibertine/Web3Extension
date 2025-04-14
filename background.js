@@ -1,92 +1,91 @@
 /// <reference types="chrome" />
 let popupWindowId = null;
+let requestQueue = [];
+let allRequests = []; // 当前正在处理的请求
+let isProcessing = false;
+let currentPort = null;
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
-  chrome.action.openPopup(); // 可选，用户安装时弹出
+  // chrome.action.openPopup(); // 可选，用户安装时弹出
 });
-let port = null; // 初始化为 null
-// 通信桥
-chrome.runtime.onConnect.addListener((port) => {
-  port = port; // 赋值给全局变量
-  if (port && port.name === "web3-connection") {
-    port.onMessage.addListener(async (msg) => {
-      if (msg.type === "WEB3_REQUEST") {
-        const { method, params, id } = msg;
-
-        if (method === "eth_accounts" || method === "eth_requestAccounts") {
-          // 弹出窗口
-          if (popupWindowId !== null) {
-            chrome.windows.get(popupWindowId, (win) => {
-              if (chrome.runtime.lastError || !win) {
-                openPopup();
-              } else {
-                chrome.windows.update(popupWindowId, { focused: true });
-              }
-            });
-          } else {
-            openPopup();
-          }
-        } 
-
-        if (method === "closePopup") {
-          closePopup();
+async function handleNextRequest() {
+  if (requestQueue.length === 0) return;
+  let activeRequest = requestQueue.shift(); // 从队列中取出
+  allRequests.push(activeRequest); // 将当前请求加入到正在处理的请求列表
+  const { msg } = activeRequest;
+  const { method, id } = msg;
+  if (method === "eth_accounts" || method === "eth_requestAccounts") {
+    // 弹窗
+    if (popupWindowId !== null) {
+      chrome.windows.get(popupWindowId, (win) => {
+        if (chrome.runtime.lastError || !win) {
+          openPopup(id);
+        } else {
+          chrome.windows.update(popupWindowId, { focused: true });
         }
-        // 向 popup 页面发送消息
-        chrome.runtime
-          .sendMessage({ method, data: params })
-          .then((response) => {
-            if (response && response.error) {
-              port.postMessage({
-                type: response.type,
-                id: id, // 添加 id
-                error: response.error,
-              });
-            } else {
-              port.postMessage({
-                type: response.type,
-                id: id, // 添加 id
-                data: response.data,
-              });
-            }
-          })
-          .catch((error) => {
-            port.postMessage({
-              type: "WEB3_ERROR",
-              id: id,
-              error: error.message || "Unknown error",
-            });
-          })
-      }
-    });
-
-    port.onDisconnect.addListener(() => {
-      port = null; // 清空 port
-    });
-  }
-});
-
-// 可被 popup 主动调用，
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === "WEB3_EVENT") {
-    const { event, data } = msg;
-    console.log("Event received:", event, data);
-    // 处理事件
-    if (port) {
-      port.postMessage({
-        type: msg.type,
-        event: event,
-        data: data,
       });
+    } else {
+      openPopup(id);
     }
   }
-  sendResponse(); // 避免报错
+}
+
+// 通信桥
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "web3-connection") {
+    port.onMessage.addListener((msg) => {
+      if (msg.type === "WEB3_REQUEST") {
+        currentPort = port;
+        requestQueue.push({ msg, port }); // 加入请求队列
+        handleNextRequest(); // 尝试处理
+      }
+    });
+    port.onDisconnect.addListener(() => {
+      console.warn("Disconnected from content script");
+  });
+  }
+});
+
+chrome.runtime.onMessage.addListener((requestMsg, sender, sendResponse) => {
+  if (requestMsg.type === "WEB3_EVENT") {
+    currentPort.postMessage({
+      type: requestMsg.type,
+      event: requestMsg.event,
+      data: requestMsg.data,
+    });
+  } else if (requestMsg.type === "WEB3_RESPONSE") {
+    const activeRequest = allRequests.find((req) => req.msg.id === requestMsg.id);
+    if (!activeRequest) {
+      console.warn("No active request to respond to.");
+      sendResponse();
+      return true;
+    }
+    const { msg, port } = activeRequest;
+    if (requestMsg.id !== msg.id) {
+      console.warn("Request ID mismatch.");
+      sendResponse();
+      return true;
+    }
+    port.postMessage({
+      type: requestMsg.type,
+      id: requestMsg.id,
+      data: requestMsg.data,
+      error: requestMsg.error,
+    });
+    handleNextRequest();
+  } else if (requestMsg.type === "closePopup") {
+    closePopup();
+  }
+  sendResponse();
   return true;
 });
 
-function openPopup() {
+function openPopup(requestId) {
+  const url =
+    chrome.runtime.getURL("dist/requestLogin.html") + `?id=${requestId}`;
   chrome.windows.create(
     {
-      url: chrome.runtime.getURL("dist/index.html"),
+      url: url,
       type: "popup",
       width: 420,
       height: 620,

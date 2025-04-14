@@ -1,5 +1,5 @@
 (() => {
-  if (window.ethereum  && !window.ethereum.isMyWallet) {
+  if (window.ethereum && !window.ethereum.isMyWallet) {
     delete window.ethereum;
   }
 
@@ -83,13 +83,10 @@
       }
     }
   });
-
-  const descriptor = Object.getOwnPropertyDescriptor(window, "ethereum");
-  if (descriptor && descriptor.configurable) {
-    Object.defineProperty(window, "ethereum", {
-      configurable: false,
-      writable: false,
-      value: provider,
-    });
-  }
+  const provider = new MyWeb3Provider();
+  Object.defineProperty(window, "ethereum", {
+    configurable: false,
+    writable: false,
+    value: provider,
+  });
 })();

@@ -4,11 +4,11 @@ const handleRuntimeMessage = () => {
   if (chrome?.runtime?.onMessage) {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const { method, data } = msg;
-
+      // 等待reqestLogin的返回
       // Helper 函数：统一发送结果
       const reply = (result, error) => {
         if (error) {
-          sendResponse({ error });
+          sendResponse({ error: error });
         } else {
           sendResponse(result);
         }
@@ -18,12 +18,6 @@ const handleRuntimeMessage = () => {
         keystoreManage.getAllWallets().then((res) => {
           const wallets = res.wallets;
           const addresses = wallets?.map((w) => w.address) || [];
-          // 主动触发 accountsChanged 事件
-          chrome.runtime.sendMessage({
-            type: "WEB3_EVENT",
-            event: "accountsChanged",
-            data: addresses,
-          });
           reply({type: "WEB3_RESPONSE", data: addresses});
         }).catch((err) => {
           reply(null, "Failed to get wallets.");

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import keystoreManage from '@/eth/util/keystoreManage';
 export default {
@@ -30,7 +30,6 @@ export default {
         const walletName = ref('walletName');
         const walletAddress = ref('0x11111...11111');
         const router = useRouter();
-
         const formatWalletAddress = (address) => {
             if (address.length <= 8) {
                 return address;
@@ -45,13 +44,28 @@ export default {
             walletName.value = keystore.walletName;
             walletAddress.value = formatWalletAddress(keystore.address);
         };
+
+        // 用户点击连接按钮后调用
+        const connect = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            await chrome.runtime.sendMessage({
+                type: "WEB3_EVENT",
+                id: parseInt(urlParams.get("id"), 10),
+                event: "accountsChanged",
+                data: [selectedWallet],
+            });
+            await chrome.runtime.sendMessage({
+                type: "WEB3_RESPONSE",
+                id: parseInt(urlParams.get("id"), 10),
+                data: [selectedWallet],
+            });
+            await chrome.runtime.sendMessage({
+                id: parseInt(urlParams.get("id"), 10),
+                type: "closePopup"
+            });
+        };
         const goBack = () => {
             router.back(); // 返回到上一个页面
-        };
-
-        const connect = () => {
-            // 连接逻辑
-            console.log("连接钱包");
         };
         init();
         return {

@@ -17,7 +17,6 @@ const router = createRouter({
 // 添加导航守卫
 router.beforeEach(async (to, from, next) => {
   await keystoreManage.initDB(); // 初始化数据库
-  handleRuntimeMessage(); // 处理消息
   next();
 });
 export default router;
