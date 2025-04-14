@@ -2,11 +2,11 @@
 let popupWindowId = null;
 let requestQueue = [];
 let allRequests = []; // 当前正在处理的请求
+let portPool = new Map(); // ✅ 用于存储连接的 port
 let isProcessing = false;
-let currentPort = null;
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
-  // chrome.action.openPopup(); // 可选，用户安装时弹出
+  chrome.action.openPopup(); // 可选，用户安装时弹出
 });
 async function handleNextRequest() {
   if (requestQueue.length === 0) return;
@@ -33,6 +33,9 @@ async function handleNextRequest() {
 // 通信桥
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "web3-connection") {
+    const portId = `${port.sender?.tab?.id}:${port.sender?.frameId}`;
+    port.postMessage({ type: "PORT_ID", portId }); // ✅ 回传给 content script
+    portPool.set(portId, port);
     port.onMessage.addListener((msg) => {
       if (msg.type === "WEB3_REQUEST") {
         currentPort = port;
@@ -41,18 +44,26 @@ chrome.runtime.onConnect.addListener((port) => {
       }
     });
     port.onDisconnect.addListener(() => {
-      console.warn("Disconnected from content script");
-  });
+      console.log(`[Disconnected] ${portId}`);
+      portPool.delete(portId); // ✅ 移除失效连接
+
+      // 可选：清除队列中属于该 port 的请求
+      requestQueue = requestQueue.filter((r) => r.port !== port);
+      allRequests = allRequests.filter((r) => r.port !== port);
+    });
   }
 });
 
 chrome.runtime.onMessage.addListener((requestMsg, sender, sendResponse) => {
   if (requestMsg.type === "WEB3_EVENT") {
-    currentPort.postMessage({
-      type: requestMsg.type,
-      event: requestMsg.event,
-      data: requestMsg.data,
-    });
+    // 广播给所有连接（或者自定义目标）
+    for (const port of portPool.values()) {
+      port.postMessage({
+        type: requestMsg.type,
+        event: requestMsg.event,
+        data: requestMsg.data,
+      });
+    }
   } else if (requestMsg.type === "WEB3_RESPONSE") {
     const activeRequest = allRequests.find((req) => req.msg.id === requestMsg.id);
     if (!activeRequest) {
