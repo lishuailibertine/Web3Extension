@@ -10,10 +10,10 @@
     "background": {
       "service_worker": "background.js"
     },
-    "host_permissions": ["*://*/*"],
+    "host_permissions": ["<all_urls>"],
     "content_scripts": [
     {
-      "matches": ["file://*/*", "http://localhost/*", "https://*/*"],
+      "matches": ["<all_urls>"],
       "js": ["scripts/content.js"],
       "run_at": "document_start",
       "all_frames": true
@@ -21,7 +21,7 @@
     ],
     "web_accessible_resources": [
     {
-      "resources": ["scripts/inject.js", "scripts/content.js", "*"],
+      "resources": ["scripts/inject.js"],
       "matches": ["<all_urls>"],
       "extension_ids": ["*"]
     }

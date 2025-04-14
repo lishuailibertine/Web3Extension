@@ -6,7 +6,7 @@ let portPool = new Map(); // ✅ 用于存储连接的 port
 let isProcessing = false;
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
-  chrome.action.openPopup(); // 可选，用户安装时弹出
+  // chrome.action.openPopup(); // 可选，用户安装时弹出
 });
 async function handleNextRequest() {
   if (requestQueue.length === 0) return;
@@ -15,13 +15,12 @@ async function handleNextRequest() {
   const { msg } = activeRequest;
   const { method, id } = msg;
   if (method === "eth_accounts" || method === "eth_requestAccounts") {
-    // 弹窗
     if (popupWindowId !== null) {
       chrome.windows.get(popupWindowId, (win) => {
         if (chrome.runtime.lastError || !win) {
           openPopup(id);
         } else {
-          chrome.windows.update(popupWindowId, { focused: true });
+          chrome.windows.update(popupWindowId, { focused: false });
         }
       });
     } else {
@@ -38,7 +37,6 @@ chrome.runtime.onConnect.addListener((port) => {
     portPool.set(portId, port);
     port.onMessage.addListener((msg) => {
       if (msg.type === "WEB3_REQUEST") {
-        currentPort = port;
         requestQueue.push({ msg, port }); // 加入请求队列
         handleNextRequest(); // 尝试处理
       }
